@@ -1,0 +1,31 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "4.27",
+	"Category": "",
+	"Description": "An example project for demonstrating and testing the RuntimeMeshComponent",
+	"Modules": [
+		{
+			"Name": "RuntimeMeshSandbox",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"RuntimeMeshComponent",
+				"Engine"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "OculusVR",
+			"Enabled": false
+		},
+		{
+			"Name": "SteamVR",
+			"Enabled": false
+		},
+		{
+			"Name": "UltraleapTracking",
+			"Enabled": true
+		}
+	]
+}
