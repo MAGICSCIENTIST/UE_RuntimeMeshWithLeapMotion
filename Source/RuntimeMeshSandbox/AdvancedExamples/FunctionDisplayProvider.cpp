@@ -122,15 +122,23 @@ void UFunctionDisplayProvider::SetPointsNumberR(int32 number)
 }
 
 void UFunctionDisplayProvider::Reset() {
-	RadiusList.Init(RadiusDefault, PointsNumber_Z);
-	float dz = SizeZ / PointsNumber_Z;
-	R_ZList.Empty();
-	for (int32 i = 0; i < PointsNumber_Z; i++)
+	try
 	{
-		R_ZList.Add(i * dz);
+		FScopeLock Lock(&ResetFlagSyncRoot);
+		RadiusList.Init(RadiusDefault, PointsNumber_Z);
+		float dz = SizeZ / PointsNumber_Z;
+		R_ZList.Empty();
+		for (int32 i = 0; i < PointsNumber_Z; i++)
+		{
+			R_ZList.Add(i * dz);
+		}
+		CalculateBounds();
+		MarkLODDirty(0);
 	}
-	CalculateBounds();
-	MarkLODDirty(0);	
+	catch (const std::exception&)
+	{
+
+	}
 	
 }
 
@@ -211,7 +219,7 @@ FBoxSphereBounds UFunctionDisplayProvider::GetBounds()
 
 bool UFunctionDisplayProvider::GetSectionMeshForLOD(int32 LODIndex, int32 SectionId, FRuntimeMeshRenderableMeshData& MeshData)
 {
-
+	FScopeLock Lock(&ResetFlagSyncRoot);
 	//check(LODIndex == 0 && SectionId == 0);
 	//float dx = (MaxX - MinX) / (float)PointsSX; //change of x between two points
 	//float dy = (MaxY - MinY) / (float)PointsSY; //change of y between two points

@@ -13,6 +13,7 @@ class RUNTIMEMESHSANDBOX_API UFunctionDisplayProvider : public URuntimeMeshProvi
 	GENERATED_BODY()
 private:
 	mutable FCriticalSection PropertySyncRoot;
+	mutable FCriticalSection ResetFlagSyncRoot;
 	FBoxSphereBounds LocalBounds;
 
 	UPROPERTY(VisibleAnywhere, BlueprintGetter = GetDisplayMaterial, BlueprintSetter = SetDisplayMaterial)
