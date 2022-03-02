@@ -11,18 +11,18 @@ UFunctionDisplayProvider::UFunctionDisplayProvider()
 	RadiusDefault = 500;
 	PointsNumber_Z = SizeZ / 30;
 	//PointsNumber_R = 2 * PI * RadiusDefault / 10;	
-	PointsNumber_R = 360 / 10 ;
+	PointsNumber_R = 360 / 10;
 	/*RadiusList[PointsNumber_Z] = { RadiusDefault };*/
 	PercentOfInsideRadius = 0.8;
-	RadiusList.Init(RadiusDefault, PointsNumber_Z);	
+	RadiusList.Init(RadiusDefault, PointsNumber_Z);
 
 	float dz = SizeZ / PointsNumber_Z;
 	for (int32 i = 0; i < PointsNumber_Z; i++)
 	{
-		R_ZList.Add(i*dz);
+		R_ZList.Add(i * dz);
 	}
 
-	
+
 	//RadiusList[4] = RadiusDefault * 0.2;
 	/*RadiusList[5] = RadiusDefault * 0.5;
 	RadiusList[6] = RadiusDefault * 0.7;*/
@@ -31,7 +31,7 @@ UFunctionDisplayProvider::UFunctionDisplayProvider()
 }
 
 void UFunctionDisplayProvider::ReCalculateConstructParams()
-{	
+{
 
 	RadiusList.Init(RadiusDefault, PointsNumber_Z);
 	float dz = SizeZ / PointsNumber_Z;
@@ -122,24 +122,19 @@ void UFunctionDisplayProvider::SetPointsNumberR(int32 number)
 }
 
 void UFunctionDisplayProvider::Reset() {
-	try
-	{
-		FScopeLock Lock(&ResetFlagSyncRoot);
-		RadiusList.Init(RadiusDefault, PointsNumber_Z);
-		float dz = SizeZ / PointsNumber_Z;
-		R_ZList.Empty();
-		for (int32 i = 0; i < PointsNumber_Z; i++)
-		{
-			R_ZList.Add(i * dz);
-		}
-		CalculateBounds();
-		MarkLODDirty(0);
-	}
-	catch (const std::exception&)
-	{
 
+	FScopeLock Lock(&ResetFlagSyncRoot);
+	RadiusList.Init(RadiusDefault, PointsNumber_Z);
+	float dz = SizeZ / PointsNumber_Z;
+	R_ZList.Empty();
+	for (int32 i = 0; i < PointsNumber_Z; i++)
+	{
+		R_ZList.Add(i * dz);
 	}
-	
+	CalculateBounds();
+	MarkLODDirty(0);
+
+
 }
 
 void UFunctionDisplayProvider::Clip(TArray<FVector> points, float clipZBlurThreshold)
@@ -151,19 +146,19 @@ void UFunctionDisplayProvider::Clip(TArray<FVector> points, float clipZBlurThres
 	for (int32 i = 0; i < points.Num(); i++)
 	{
 		FVector point = points[i];
-		float distane_p_o =FMath::Sqrt(point.X * point.X + point.Y * point.Y);
-		TArray<int32> nearbyZPointsIndex = FindNearestAndInRangeIndex(R_ZList, point.Z, clipZBlurThreshold, 0, PointsNumber_Z-1);
+		float distane_p_o = FMath::Sqrt(point.X * point.X + point.Y * point.Y);
+		TArray<int32> nearbyZPointsIndex = FindNearestAndInRangeIndex(R_ZList, point.Z, clipZBlurThreshold, 0, PointsNumber_Z - 1);
 
 		for (int32 j = 0; j < nearbyZPointsIndex.Num(); j++)
 		{
 			int32 index = nearbyZPointsIndex[j];
 			if (RadiusList[index] > distane_p_o) {
 				RadiusList[index] = distane_p_o;
-			}		 				
+			}
 		}
 	}
 
-	MarkLODDirty(0);	
+	MarkLODDirty(0);
 }
 
 float UFunctionDisplayProvider::GetPercentOfInsideRadius() const
@@ -306,7 +301,7 @@ bool UFunctionDisplayProvider::GetSectionMeshForLOD(int32 LODIndex, int32 Sectio
 
 
 	//上下
-	DrawHead(MeshData, 0,insideStartIndex-1, insideStartIndex, MeshData.Positions.Num()-1);
+	DrawHead(MeshData, 0, insideStartIndex - 1, insideStartIndex, MeshData.Positions.Num() - 1);
 
 	return true;
 
@@ -440,7 +435,7 @@ void UFunctionDisplayProvider::DrawBody(TArray<float> RadiusList, FRuntimeMeshRe
 		if (V_inDebt > 0) {
 			float increaseH = V_inDebt / (PI * radius * radius * areaCoefficient); // 需要增加的高度偏移		
 			//TODO: check this damage number
-			increaseH = FMath::Min(dz * 10* PercentOfInsideRadius, increaseH);
+			increaseH = FMath::Min(dz * 10 * PercentOfInsideRadius, increaseH);
 			accumulateOffsetZ += increaseH;
 			V_inDebt = 0;
 			//UE_LOG(LogTemp, Warning, TEXT("increaseH: %s - %s"), increaseH,accumulateOffsetZ);
@@ -546,15 +541,15 @@ void UFunctionDisplayProvider::DrawBody(TArray<float> RadiusList, FRuntimeMeshRe
 }
 
 
-void UFunctionDisplayProvider::DrawHead(FRuntimeMeshRenderableMeshData& MeshData,int32 outsideStartIndex, int32 outsideEndIndex, int32 insideStartIndex,int32 insideEndIndex) {
+void UFunctionDisplayProvider::DrawHead(FRuntimeMeshRenderableMeshData& MeshData, int32 outsideStartIndex, int32 outsideEndIndex, int32 insideStartIndex, int32 insideEndIndex) {
 
 	TArray<int32> LineOut;
 	TArray<int32> LineInside;
-	int32 lastIndex = MeshData.Positions.Num()-1;
+	int32 lastIndex = MeshData.Positions.Num() - 1;
 	//top
 	for (int32 i = 0; i < PointsNumber_R; i++)
 	{
-		LineOut.Add(outsideEndIndex - PointsNumber_R +i+1);
+		LineOut.Add(outsideEndIndex - PointsNumber_R + i + 1);
 		LineInside.Add(insideEndIndex - PointsNumber_R + i + 1);
 	}
 	Fill(MeshData, LineOut, LineInside, false);
@@ -566,7 +561,7 @@ void UFunctionDisplayProvider::DrawHead(FRuntimeMeshRenderableMeshData& MeshData
 	LineInside.Empty(LineInside.Num());
 	for (int32 i = 0; i < PointsNumber_R; i++)
 	{
-		LineOut.Add(i * 2+ outsideStartIndex);
+		LineOut.Add(i * 2 + outsideStartIndex);
 		LineInside.Add(i * 2 + insideStartIndex);
 	}
 	Fill(MeshData, LineOut, LineInside, true);
@@ -744,22 +739,22 @@ int32 UFunctionDisplayProvider::TryGetMeshPointIndex(int32 zindex, int32 rindex,
 	return index;
 }
 
-TArray<int32> UFunctionDisplayProvider::FindNearestAndInRangeIndex(TArray<float>list, float value, float Threshold,int32 startIndex,int32 endIndex) {
-	
-	if (endIndex < 0||endIndex>=list.Num()) {
-		endIndex = list.Num()-1;
+TArray<int32> UFunctionDisplayProvider::FindNearestAndInRangeIndex(TArray<float>list, float value, float Threshold, int32 startIndex, int32 endIndex) {
+
+	if (endIndex < 0 || endIndex >= list.Num()) {
+		endIndex = list.Num() - 1;
 	}
 
 	int32 nearleastIndex = 0;
 	float nearleastValue = -1;
 	TArray<int32> res;
 
-	for (int32 i = startIndex; i < endIndex+1; i++)
+	for (int32 i = startIndex; i < endIndex + 1; i++)
 	{
 		float item = list[i];
 		float diff = FMath::Abs(item - value);
 		//UE_LOG(LogTemp, Warning, TEXT("diff: %f"),diff);
-		if (diff < nearleastValue|| nearleastValue==-1) {
+		if (diff < nearleastValue || nearleastValue == -1) {
 			nearleastIndex = i;
 			nearleastValue = diff;
 			//UE_LOG(LogTemp, Warning, TEXT("nearleastValue: %f"), nearleastValue);
